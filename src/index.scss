@@ -1,0 +1,38 @@
+@font-face {
+  font-family: "regular";
+  font-display: swap;
+  src: url("Fonts/Poppins-Regular.ttf");
+}
+@font-face {
+  font-family: "SemiBold";
+  font-display: swap;
+  src: url("Fonts/Poppins-SemiBold.ttf");
+}
+@font-face {
+  font-family: "Bold";
+  font-display: swap;
+  src: url("Fonts/Poppins-Bold.ttf");
+}
+
+html {
+  height: 100%;
+  background: linear-gradient(to right, #1cefff, #c0c0aa);
+}
+body {
+  height: 100%;
+  margin: 0px;
+  font-family: "regular";
+}
+#root {
+  height: 100%;
+}
+
+:root {
+  --app-color: #1394ff;
+}
+
+@media only screen and (max-width: 768px) {
+  html {
+    background: #fff!important;
+  }
+}

@@ -1,5 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Live Demo](https://prachi00.github.io/weather-app)
 
+A responsive weather app with search functionality and charts to show more information.
 ## Available Scripts
 
 In the project directory, you can run:

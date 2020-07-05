@@ -1,0 +1,124 @@
+.dashboard {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &__parent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 50%;
+    background: #fff;
+    padding: 23px;
+  }
+  &__card {
+    width: 86%;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 0px 10px #1111113d;
+  }
+  &__forecast {
+    display: flex;
+    margin-bottom: 19px;
+    margin-top: 19px;
+    &__container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 13px;
+      &__active {
+        border: 2px solid var(--app-color);
+      }
+    }
+    &__desc {
+      font-size: 14px;
+      color: #ada8a8;
+      font-family: "SemiBold";
+    }
+    &__image {
+      object-fit: cover;
+    }
+    &__min {
+      color: #7b7979;
+    }
+    &__temp {
+      margin-right: 2px;
+    }
+  }
+  &__current {
+    display: flex;
+    flex-direction: column;
+    &__info {
+      display: flex;
+      align-items: center;
+      height: 50px;
+    }
+    &__temp {
+      font-size: 2em;
+      font-family: "bold";
+    }
+    &__hourly {
+      display: flex;
+      overflow: auto;
+    }
+  }
+  &__extra {
+    margin-top: 20px;
+    justify-content: space-around;
+    display: flex;
+    &__option {
+      &__label {
+        font-family: "SemiBold";
+        font-size: 15px;
+      }
+      background: #e4f1f9;
+      display: flex;
+      flex-direction: column;
+      width: 130px;
+      padding: 6px;
+    }
+    &__sun {
+      display: flex;
+      flex-direction: column;
+      &__time {
+        font-size: 14px;
+        color: #7b7979;
+      }
+    }
+  }
+  &__hourly {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    &__time {
+      font-family: "bold";
+    }
+    &__temp {
+      width: 66px;
+      word-break: break-all;
+    }
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .dashboard {
+    background: #fff;
+  }
+  .dashboard__parent {
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
+  }
+  .dashboard__forecast {
+    width: 100%;
+    overflow: auto;
+  }
+  .dashboard__extra {
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
