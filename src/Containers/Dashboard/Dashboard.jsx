@@ -1,67 +1,57 @@
 import classes from "./Dashboard.module.scss";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getTime, getDay } from "../../Pipes/datePipe";
 import Search from "../../Components/Search/Search";
 import Loader from "../../Components/Loader/Loader";
 import ChartMap from "../../Components/Chart/Chart";
 
-let today = getDay();
 
 const Dashboard = () => {
+  let forecastObj = useRef({});
   let [current, setCurrent] = useState();
   let [hour, setHour] = useState([]);
   let [chartsData, setChartsData] = useState([]);
   let [daily, setDaily] = useState([]);
+  let [selected, setSelected] = useState([]);
   let [name, setName] = useState([]);
   let [loader, setLoader] = useState(true);
+  let [coords, setCoords] = useState({});
   const getWeatherData = (lat, lon) => {
     let weatherApi;
 
-    weatherApi = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${
-      process.env.REACT_APP_API_KEY
-    }`;
+    weatherApi = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.REACT_APP_API_KEY}`;
 
     fetch(weatherApi)
       .then((response) => response.json())
       .then(
         (response) => {
-                        setLoader(false);
-                        setCurrent(response.current);
-                        let hourData = [];
-                        let charts = [];
-                        // response.hourly.slice(0, 24).map((item) => {
-                        //   let date = new Date(item.dt * 1000);
-                        //   let time = getTime(date);
-                        //   hourData.push([`${Math.ceil(item.temp)}°C`, time]);
-                        //   charts.push(Math.ceil(item.temp));
-                        // });
-                        for (const item of response.hourly.slice(0, 24)) {
-                          let date = new Date(item.dt * 1000);
-                          let time = getTime(date);
-                          hourData.push([`${Math.ceil(item.temp)}°C`, time]);
-                          charts.push(Math.ceil(item.temp));
-                        }
-                        setHour(hourData);
-                        setChartsData(charts);
-                        let forecastData = [];
-                        // response.daily.slice(0, 7).map((item) => {
-
-                        // });
-                        for (const item of response.daily.slice(0, 7)) {
-                          let dayOfWeek = getDay(item.dt);
-                          forecastData.push({
-                            day: dayOfWeek,
-                            min: Math.ceil(item.temp.min),
-                            max: Math.ceil(item.temp.max),
-                            icon: item.weather[0].icon,
-                            desc: item.weather[0].main,
-                          });
-                        }
-                        setDaily(forecastData);
-                      },
+          setLoader(false);
+          setCurrent(response.current);
+          let forecastData = [];
+          for (const item of response.daily.slice(0, 6)) {
+            let dayOfWeek = getDay(item.dt);
+            forecastData.push({
+              day: dayOfWeek,
+              dt: item.dt,
+              min: Math.ceil(item.temp.min),
+              max: Math.ceil(item.temp.max),
+              icon: item.weather[0].icon,
+              desc: item.weather[0].main,
+            });
+          }
+          setDaily(forecastData);
+          /* by default 0th is selected */
+          setSelected(forecastData[0]);
+        },
         (error) => {}
       );
   };
+
+  useEffect(() => {
+    if (daily.length) {
+      getForecastDetail();
+    }
+  }, [daily]);
 
   const getCityName = (lat, lon) => {
     let weatherApi;
@@ -76,6 +66,10 @@ const Dashboard = () => {
   };
   const success = (position) => {
     localStorage.setItem("location-allowed", true);
+    setCoords({
+      lat: position.coords.latitude,
+      lon: position.coords.longitude,
+    });
     getCityName(position.coords.latitude, position.coords.longitude);
     getWeatherData(position.coords.latitude, position.coords.longitude);
   };
@@ -103,6 +97,55 @@ const Dashboard = () => {
 
   const getSearchData = (lat, lon) => {
     getWeatherData(lat, lon);
+    setCoords({
+      lat: lat,
+      lon: lon,
+    });
+  };
+
+  const getForecastDetail = () => {
+    let weatherApi;
+    weatherApi = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${process.env.REACT_APP_API_KEY}`;
+    fetch(weatherApi)
+      .then((response) => response.json())
+      .then((response) => {
+        let forecastArr = [];
+        let curr;
+        for (const item of response.list) {
+          curr = getDay(item.dt);
+
+          if (forecastObj.current && !forecastObj.current[curr]) {
+            forecastArr = [];
+          }
+          forecastArr.push({ ...item, ...response.city });
+          forecastObj.current[curr] = forecastArr;
+          setCurrent({
+            ...forecastObj.current[curr][0],
+            ...forecastObj.current[curr][0].main,
+            ...response.city,
+          });
+        }
+        getForecastForDay(daily[0], true);
+      });
+  };
+
+  const getForecastForDay = (item, first) => {
+    setSelected(item);
+    let charts = [];
+    let hourData = [];
+    if (!first) {
+      setCurrent({
+        ...forecastObj.current[item.day][0],
+        ...forecastObj.current[item.day][0].main,
+      });
+    }
+    for (const data of forecastObj.current[item.day]) {
+      charts.push(data.main.temp);
+      let time = getTime(new Date(data.dt * 1000));
+      hourData.push([`${Math.ceil(data.main.temp)}°C`, time]);
+    }
+    setChartsData(charts);
+    setHour(hourData);
   };
 
   return (
@@ -119,10 +162,11 @@ const Dashboard = () => {
                   <div
                     key={index}
                     className={`${classes.dashboard__forecast__container} ${
-                      item.day === today
+                      item === selected
                         ? `${classes.dashboard__forecast__container__active}`
                         : ""
                     }`}
+                    onClick={() => getForecastForDay(item)}
                   >
                     <span>{item.day}</span>
                     <div>

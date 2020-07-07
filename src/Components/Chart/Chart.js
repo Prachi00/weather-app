@@ -7,11 +7,11 @@ export default function ChartMap(props) {
     new Chart(ctx, {
       type: "line",
       data: {
-        labels: props.label,
+        labels: props.label, //data that is shown below
         datasets: [
           {
             label: "Temperature",
-            data: props.data,
+            data: props.data, //data mapped with blue lines
             backgroundColor: "rgba(255,255,255,0.1)",
             borderColor: "rgba(54, 162, 235)",
             pointBackgroundColor: "rgba(54, 162, 235, 1)",
@@ -39,7 +39,7 @@ export default function ChartMap(props) {
   };
   useEffect(() => {
     createChart();
-  }, []);
+  });
   return (
     <div className={classes.chart}>
       <div className={classes.chart__child}>
